@@ -3,6 +3,11 @@ import dns_compare
 
 domains = [
     'globaldots.com',
+    'danidin.net',
+]
+
+domains = [
+    'globaldots.com',
     'danidin.net'
 ]
 
@@ -12,8 +17,13 @@ arguments = dict(
     original_dns="dyn",
     current_nameserver="dns1.p03.nsone.net",
     verbose=False,
+    compare_soa=False,
+    compare_ns=False,
+    compare_ttl=False,
+    lookup_cnames =  True,
     output="table",
-    header = False
+    header = False,
+
 )
 
 # output header, as header is suppressed on the main funtion

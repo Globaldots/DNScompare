@@ -35,6 +35,33 @@ except ImportError:
     sys.exit(1)
 
 
+def relativize(rdataset, zone):
+    if rdataset.rdtype == CNAME:
+        mx_list = [str(answer.target.relativize(zone)) for answer in rdataset]
+        result = dns.rdataset.from_text(
+            rdataset.rdclass,
+            rdataset.rdtype,
+            rdataset.ttl,
+            str(rdataset[0].target.relativize(zone))  # there can be only 1 answer anyway, so the first one is safe to use
+        )
+    elif rdataset.rdtype == MX:
+        # in this case, a loop is more readable than list comprehension..
+        mx_list = []
+        for answer in rdataset:
+            rdata = str(answer.preference) + " " + str(answer.exchange.relativize(zone))
+            mx_list.append(rdata)
+
+        result = dns.rdataset.from_text_list(
+            rdataset.rdclass,
+            rdataset.rdtype,
+            rdataset.ttl,
+            mx_list
+        )
+    else:
+        result = rdataset
+    return result
+
+
 def DNSCompare(**kwargs):
     global zone_transfer_map
     original_dns = kwargs.get("original_dns")
@@ -80,13 +107,9 @@ def DNSCompare(**kwargs):
             fqdn = dns.name.from_text(str(name), origin=zone)
             ans = migrated_zone.query(fqdn, rdataset.rdtype, rdataset.rdclass)
             result = ans.rrset.to_rdataset()
-            if result.rdtype==CNAME:
-                result = dns.rdataset.from_text(
-                    result.rdclass,
-                    result.rdtype,
-                    result.ttl,
-                    str(result[0].target.relativize(zone)) # there can be only 1 answer anyway, so the first one is safe to use
-                )
+
+            result = relativize(result, zone)
+
             if result == rdataset:
                 if compare_ttl:
                     if result.ttl == rdataset.ttl:
