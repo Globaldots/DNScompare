@@ -171,6 +171,7 @@ def DNSCompare(**kwargs):
 if __name__ == '__main__':
     # if executed from commandline and -d is the first parm
     if len(sys.argv) > 1 and str(sys.argv[1]).lower() == "-d":
+        # DEBUG mode helps with debugging without command line arguments
         DEBUG = True
         sys.argv = [sys.argv[0], "-d"]
 
