@@ -6,11 +6,6 @@ domains = [
     'danidin.net',
 ]
 
-domains = [
-    'globaldots.com',
-    'danidin.net'
-]
-
 arguments = dict(
     DEBUG=False,
     zone=None,
